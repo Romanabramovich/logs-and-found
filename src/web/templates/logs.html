@@ -1,8 +1,5 @@
-{% extends "base.html" %}
-
-{% block title %}Logs - Log Aggregation System{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Logs & Found{% endblock %} {% block
+content %}
 
 <!-- Statistics Cards -->
 {% include 'components/stats_cards.html' %}
@@ -11,179 +8,188 @@
 {% include 'components/filter_panel.html' %}
 
 <!-- Logs Table -->
-{% include 'components/logs_table.html' %}
-
-{% endblock %}
-
-{% block extra_js %}
+{% include 'components/logs_table.html' %} {% endblock %} {% block extra_js %}
 <script>
-// WebSocket Real-Time Log Streaming
-(function() {
+  // WebSocket Real-Time Log Streaming
+  (function () {
     let ws = null;
     let isConnected = false;
     let reconnectAttempts = 0;
     const maxReconnectAttempts = 5;
     const reconnectDelay = 3000; // 3 seconds
-    
+
     // UI Elements
-    const statusBadge = document.getElementById('ws-status');
-    const toggleBtn = document.getElementById('ws-toggle');
-    const logsTableBody = document.querySelector('.logs-container tbody');
-    
+    const statusBadge = document.getElementById("ws-status");
+    const toggleBtn = document.getElementById("ws-toggle");
+    const logsTableBody = document.querySelector(".logs-container tbody");
+
     function updateStatus(status, text) {
-        if (!statusBadge) return;
-        
-        statusBadge.className = `badge bg-${status === 'connected' ? 'success' : status === 'connecting' ? 'warning' : 'secondary'}`;
-        statusBadge.textContent = text;
+      if (!statusBadge) return;
+
+      statusBadge.className = `badge bg-${
+        status === "connected"
+          ? "success"
+          : status === "connecting"
+          ? "warning"
+          : "secondary"
+      }`;
+      statusBadge.textContent = text;
     }
-    
+
     function connectWebSocket() {
-        if (ws && ws.readyState === WebSocket.OPEN) {
-            return; // Already connected
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        return; // Already connected
+      }
+
+      updateStatus("connecting", "⟳ Connecting...");
+
+      // Use IP address to avoid Windows localhost DNS delay
+      ws = new WebSocket("ws://127.0.0.1:5000/ws/logs");
+
+      ws.onopen = function () {
+        console.log("WebSocket connected");
+        isConnected = true;
+        reconnectAttempts = 0;
+        updateStatus("connected", "● Live");
+
+        if (toggleBtn) {
+          toggleBtn.textContent = "Pause Live";
+          toggleBtn.classList.remove("btn-success");
+          toggleBtn.classList.add("btn-warning");
         }
-        
-        updateStatus('connecting', '⟳ Connecting...');
-        
-        // Use IP address to avoid Windows localhost DNS delay
-        ws = new WebSocket('ws://127.0.0.1:5000/ws/logs');
-        
-        ws.onopen = function() {
-            console.log('WebSocket connected');
-            isConnected = true;
-            reconnectAttempts = 0;
-            updateStatus('connected', '● Live');
-            
-            if (toggleBtn) {
-                toggleBtn.textContent = 'Pause Live';
-                toggleBtn.classList.remove('btn-success');
-                toggleBtn.classList.add('btn-warning');
-            }
-        };
-        
-        ws.onmessage = function(event) {
-            try {
-                const log = JSON.parse(event.data);
-                addLogToTable(log);
-            } catch (e) {
-                console.error('Error parsing log message:', e);
-            }
-        };
-        
-        ws.onerror = function(error) {
-            console.error('WebSocket error:', error);
-            updateStatus('disconnected', '✕ Error');
-        };
-        
-        ws.onclose = function() {
-            console.log('WebSocket disconnected');
-            isConnected = false;
-            updateStatus('disconnected', '○ Offline');
-            
-            if (toggleBtn) {
-                toggleBtn.textContent = 'Resume Live';
-                toggleBtn.classList.remove('btn-warning');
-                toggleBtn.classList.add('btn-success');
-            }
-            
-            // Attempt reconnection
-            if (reconnectAttempts < maxReconnectAttempts) {
-                reconnectAttempts++;
-                console.log(`Reconnecting... (attempt ${reconnectAttempts}/${maxReconnectAttempts})`);
-                setTimeout(connectWebSocket, reconnectDelay);
-            }
-        };
-    }
-    
-    function disconnectWebSocket() {
-        if (ws) {
-            ws.close();
-            ws = null;
+      };
+
+      ws.onmessage = function (event) {
+        try {
+          const log = JSON.parse(event.data);
+          addLogToTable(log);
+        } catch (e) {
+          console.error("Error parsing log message:", e);
         }
+      };
+
+      ws.onerror = function (error) {
+        console.error("WebSocket error:", error);
+        updateStatus("disconnected", "✕ Error");
+      };
+
+      ws.onclose = function () {
+        console.log("WebSocket disconnected");
         isConnected = false;
-        updateStatus('disconnected', '○ Paused');
+        updateStatus("disconnected", "○ Offline");
+
+        if (toggleBtn) {
+          toggleBtn.textContent = "Resume Live";
+          toggleBtn.classList.remove("btn-warning");
+          toggleBtn.classList.add("btn-success");
+        }
+
+        // Attempt reconnection
+        if (reconnectAttempts < maxReconnectAttempts) {
+          reconnectAttempts++;
+          console.log(
+            `Reconnecting... (attempt ${reconnectAttempts}/${maxReconnectAttempts})`
+          );
+          setTimeout(connectWebSocket, reconnectDelay);
+        }
+      };
     }
-    
+
+    function disconnectWebSocket() {
+      if (ws) {
+        ws.close();
+        ws = null;
+      }
+      isConnected = false;
+      updateStatus("disconnected", "○ Paused");
+    }
+
     function addLogToTable(log) {
-        if (!logsTableBody) return;
-        
-        // Format timestamp
-        const timestamp = new Date(log.timestamp).toLocaleString('en-US', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-        }).replace(',', '');
-        
-        // Create new row
-        const row = document.createElement('tr');
-        row.className = 'log-row log-row-new';
-        row.innerHTML = `
+      if (!logsTableBody) return;
+
+      // Format timestamp
+      const timestamp = new Date(log.timestamp)
+        .toLocaleString("en-US", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        })
+        .replace(",", "");
+
+      // Create new row
+      const row = document.createElement("tr");
+      row.className = "log-row log-row-new";
+      row.innerHTML = `
             <td class="timestamp">${timestamp}</td>
-            <td><span class="log-level log-level-${log.level}">${log.level}</span></td>
+            <td><span class="log-level log-level-${log.level}">${
+        log.level
+      }</span></td>
             <td><code>${escapeHtml(log.source)}</code></td>
             <td><small>${escapeHtml(log.application)}</small></td>
             <td class="log-message">${escapeHtml(log.message)}</td>
         `;
-        
-        // Insert at top of table
-        logsTableBody.insertBefore(row, logsTableBody.firstChild);
-        
-        // Add highlight animation
-        setTimeout(() => row.classList.remove('log-row-new'), 100);
-        
-        // Limit table size (keep last 100 logs)
-        while (logsTableBody.children.length > 100) {
-            logsTableBody.removeChild(logsTableBody.lastChild);
-        }
+
+      // Insert at top of table
+      logsTableBody.insertBefore(row, logsTableBody.firstChild);
+
+      // Add highlight animation
+      setTimeout(() => row.classList.remove("log-row-new"), 100);
+
+      // Limit table size (keep last 100 logs)
+      while (logsTableBody.children.length > 100) {
+        logsTableBody.removeChild(logsTableBody.lastChild);
+      }
     }
-    
+
     function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
     }
-    
+
     function toggleLiveMode() {
-        if (isConnected) {
-            disconnectWebSocket();
-        } else {
-            connectWebSocket();
-        }
+      if (isConnected) {
+        disconnectWebSocket();
+      } else {
+        connectWebSocket();
+      }
     }
-    
+
     // Initialize
     if (toggleBtn) {
-        toggleBtn.addEventListener('click', toggleLiveMode);
+      toggleBtn.addEventListener("click", toggleLiveMode);
     }
-    
+
     // Auto-connect on page load
     connectWebSocket();
-    
+
     // Cleanup on page unload
-    window.addEventListener('beforeunload', function() {
-        if (ws) {
-            ws.close();
-        }
+    window.addEventListener("beforeunload", function () {
+      if (ws) {
+        ws.close();
+      }
     });
-})();
+  })();
 </script>
 
 <style>
-/* Animation for new log rows */
-.log-row-new {
+  /* Animation for new log rows */
+  .log-row-new {
     animation: highlight 2s ease-in-out;
-}
+  }
 
-@keyframes highlight {
-    0%, 100% {
-        background-color: transparent;
+  @keyframes highlight {
+    0%,
+    100% {
+      background-color: transparent;
     }
     10% {
-        background-color: rgba(25, 135, 84, 0.2);
+      background-color: rgba(25, 135, 84, 0.2);
     }
-}
+  }
 </style>
 {% endblock %}
