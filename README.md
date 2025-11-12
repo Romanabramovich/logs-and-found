@@ -474,71 +474,16 @@ python -m src.queue.worker_pool --workers 5 --batch-size 100
 
 ---
 
-## 🐳 Docker Deployment (Coming Soon)
-
-```bash
-# Start all services
-docker-compose up -d
-
-# Includes: FastAPI, PostgreSQL, Redis, Grafana, Workers
-```
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit pull requests or open issues.
-
-### Adding Custom Parsers
-
-```python
-from src.parsers.base import LogParser
-from src.api.schemas import LogCreate
-
-class MyCustomParser(LogParser):
-    def parse(self, raw_log: str) -> LogCreate:
-        # Your parsing logic here
-        return LogCreate(
-            timestamp=...,
-            level=...,
-            source=...,
-            application=...,
-            message=...,
-            metadata=...
-        )
-```
-
----
-
-## 📄 License
-
-MIT License - See [LICENSE](LICENSE) file for details
-
----
-
-## 🙏 Acknowledgments
-
-Built with modern Python async patterns and industry-standard tools:
-- FastAPI for blazing-fast API performance
-- PostgreSQL for reliable data persistence
-- Redis for distributed message queuing
-- Grafana for professional observability
-
----
-
 ## 📧 Contact
 
-**Project Maintainer:** [Your Name]
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your Profile](https://linkedin.com/in/yourprofile)
-- Email: your.email@example.com
+**Project Maintainer:** [Roman Abramovich]
+- GitHub: [@yourusername](https://github.com/RomanAbramovich)
+- LinkedIn: [Your Profile](www.linkedin.com/in/roman-abramovich)
+- Email: abramovichroman19@gmail.com
 
 ---
 
 <div align="center">
 
 **⭐ Star this repo if you find it useful!**
-
-[Report Bug](https://github.com/yourusername/log-aggregation/issues) • [Request Feature](https://github.com/yourusername/log-aggregation/issues)
-
 </div>
