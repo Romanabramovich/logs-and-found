@@ -193,14 +193,14 @@ graph TB
 
     Grafana["GRAFANA<br/>• Time-series<br/>• Alerts<br/>• Analytics<br/>• Custom panels"]
 
-    style Sources fill:#e6f3ff,stroke:#000000,stroke-width:2px
-    style API fill:#e6ffe6,stroke:#000000,stroke-width:3px
-    style FastAPI fill:#f0ffe6,stroke:#000000,stroke-width:2px
-    style Redis fill:#ffe6e6,stroke:#000000,stroke-width:3px
-    style WorkerPool fill:#fff4e6,stroke:#000000,stroke-width:2px
-    style DB fill:#e6ffe6,stroke:#000000,stroke-width:3px
-    style Dashboard fill:#f0e6ff,stroke:#000000,stroke-width:2px
-    style Grafana fill:#ffe6f0,stroke:#000000,stroke-width:2px
+    style Sources fill:#e6f3ff,stroke:#0066cc,stroke-width:2px,color:#000000
+    style API fill:#e6ffe6,stroke:#00cc00,stroke-width:3px,color:#000000
+    style FastAPI fill:#e6ffe6,stroke:#00cc00,stroke-width:2px,color:#000000
+    style Redis fill:#ffe6e6,stroke:#cc0000,stroke-width:3px,color:#000000
+    style WorkerPool fill:#fff4e6,stroke:#ff9900,stroke-width:2px,color:#000000
+    style DB fill:#e6ffe6,stroke:#00cc00,stroke-width:3px,color:#000000
+    style Dashboard fill:#f0e6ff,stroke:#9900cc,stroke-width:2px,color:#000000
+    style Grafana fill:#f0e6ff,stroke:#9900cc,stroke-width:2px,color:#000000
 ```
 
 ### Data Flow

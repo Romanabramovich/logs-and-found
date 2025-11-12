@@ -39,14 +39,14 @@ flowchart TD
     
     Browser -.->|ws://server/ws/logs| WSManager
     
-    style Client fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
-    style API fill:#e6ffe6,stroke:#00cc00,stroke-width:3px
-    style Stream fill:#ffe6e6,stroke:#cc0000,stroke-width:2px
-    style Workers fill:#fff4e6,stroke:#ff9900,stroke-width:2px
-    style DB fill:#e6ffe6,stroke:#00cc00,stroke-width:3px
-    style PubSub fill:#ffe6e6,stroke:#cc0000,stroke-width:3px
-    style WSManager fill:#f0e6ff,stroke:#9900cc,stroke-width:3px
-    style Browser fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style Client fill:#e6f3ff,stroke:#0066cc,stroke-width:2px,color:#000000
+    style API fill:#e6ffe6,stroke:#00cc00,stroke-width:3px,color:#000000
+    style Stream fill:#ffe6e6,stroke:#cc0000,stroke-width:2px,color:#000000
+    style Workers fill:#fff4e6,stroke:#ff9900,stroke-width:2px,color:#000000
+    style DB fill:#e6ffe6,stroke:#00cc00,stroke-width:3px,color:#000000
+    style PubSub fill:#ffe6e6,stroke:#cc0000,stroke-width:3px,color:#000000
+    style WSManager fill:#f0e6ff,stroke:#9900cc,stroke-width:3px,color:#000000
+    style Browser fill:#e6f3ff,stroke:#0066cc,stroke-width:2px,color:#000000
 ```
 
 **Data Flow:**

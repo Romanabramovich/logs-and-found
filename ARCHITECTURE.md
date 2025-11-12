@@ -57,10 +57,10 @@ graph TB
         Stream --> Consumers
     end
     
-    style Redis fill:#ffe6e6,stroke:#cc0000,stroke-width:2px
-    style Stream fill:#fff4e6,stroke:#ff9900,stroke-width:2px
-    style Message fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
-    style Consumers fill:#e6ffe6,stroke:#00cc00,stroke-width:2px
+    style Redis fill:#ffe6e6,stroke:#cc0000,stroke-width:2px,color:#000000
+    style Stream fill:#fff4e6,stroke:#ff9900,stroke-width:2px,color:#000000
+    style Message fill:#e6f3ff,stroke:#0066cc,stroke-width:2px,color:#000000
+    style Consumers fill:#e6ffe6,stroke:#00cc00,stroke-width:2px,color:#000000
 ```
 
 **Benefits:**
@@ -91,11 +91,11 @@ graph TB
     W2 -->|Batch Insert| DB
     W3 -->|Batch Insert| DB
     
-    style WorkerPool fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
-    style W1 fill:#fff4e6,stroke:#ff9900,stroke-width:2px
-    style W2 fill:#fff4e6,stroke:#ff9900,stroke-width:2px
-    style W3 fill:#fff4e6,stroke:#ff9900,stroke-width:2px
-    style DB fill:#e6ffe6,stroke:#00cc00,stroke-width:3px
+    style WorkerPool fill:#e6f3ff,stroke:#0066cc,stroke-width:2px,color:#000000
+    style W1 fill:#fff4e6,stroke:#ff9900,stroke-width:2px,color:#000000
+    style W2 fill:#fff4e6,stroke:#ff9900,stroke-width:2px,color:#000000
+    style W3 fill:#fff4e6,stroke:#ff9900,stroke-width:2px,color:#000000
+    style DB fill:#e6ffe6,stroke:#00cc00,stroke-width:3px,color:#000000
 ```
 
 **Configuration:**
@@ -267,11 +267,11 @@ flowchart TD
     
     Factory --> LogCreate([LogCreate Object])
     
-    style Start fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
-    style Detect fill:#fff4e6,stroke:#ff9900,stroke-width:2px
-    style Factory fill:#e6ffe6,stroke:#00cc00,stroke-width:2px
-    style LogCreate fill:#e6ffe6,stroke:#00cc00,stroke-width:3px
-    style Error fill:#ffe6e6,stroke:#cc0000,stroke-width:2px
+    style Start fill:#e6f3ff,stroke:#0066cc,stroke-width:2px,color:#000000
+    style Detect fill:#fff4e6,stroke:#ff9900,stroke-width:2px,color:#000000
+    style Factory fill:#e6ffe6,stroke:#00cc00,stroke-width:2px,color:#000000
+    style LogCreate fill:#e6ffe6,stroke:#00cc00,stroke-width:3px,color:#000000
+    style Error fill:#ffe6e6,stroke:#cc0000,stroke-width:2px,color:#000000
 ```
 
 **Extensibility:**
@@ -316,13 +316,13 @@ flowchart TD
     
     WS["WebSocket Clients<br/>Live dashboard updates"]
     
-    style Client fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
-    style API fill:#e6ffe6,stroke:#00cc00,stroke-width:3px
-    style Redis fill:#ffe6e6,stroke:#cc0000,stroke-width:2px
-    style Workers fill:#fff4e6,stroke:#ff9900,stroke-width:2px
-    style DB fill:#e6ffe6,stroke:#00cc00,stroke-width:3px
-    style PubSub fill:#ffe6e6,stroke:#cc0000,stroke-width:2px
-    style WS fill:#f0e6ff,stroke:#9900cc,stroke-width:2px
+    style Client fill:#e6f3ff,stroke:#0066cc,stroke-width:2px,color:#000000
+    style API fill:#e6ffe6,stroke:#00cc00,stroke-width:3px,color:#000000
+    style Redis fill:#ffe6e6,stroke:#cc0000,stroke-width:2px,color:#000000
+    style Workers fill:#fff4e6,stroke:#ff9900,stroke-width:2px,color:#000000
+    style DB fill:#e6ffe6,stroke:#00cc00,stroke-width:3px,color:#000000
+    style PubSub fill:#ffe6e6,stroke:#cc0000,stroke-width:2px,color:#000000
+    style WS fill:#f0e6ff,stroke:#9900cc,stroke-width:2px,color:#000000
 ```
 
 **Latency Breakdown:**
@@ -405,12 +405,12 @@ graph TD
     API2 --> DB
     API3 --> DB
     
-    style LB fill:#e6f3ff,stroke:#0066cc,stroke-width:3px
-    style API1 fill:#e6ffe6,stroke:#00cc00,stroke-width:2px
-    style API2 fill:#e6ffe6,stroke:#00cc00,stroke-width:2px
-    style API3 fill:#e6ffe6,stroke:#00cc00,stroke-width:2px
-    style Redis fill:#ffe6e6,stroke:#cc0000,stroke-width:3px
-    style DB fill:#fff4e6,stroke:#ff9900,stroke-width:3px
+    style LB fill:#e6f3ff,stroke:#0066cc,stroke-width:3px,color:#000000
+    style API1 fill:#e6ffe6,stroke:#00cc00,stroke-width:2px,color:#000000
+    style API2 fill:#e6ffe6,stroke:#00cc00,stroke-width:2px,color:#000000
+    style API3 fill:#e6ffe6,stroke:#00cc00,stroke-width:2px,color:#000000
+    style Redis fill:#ffe6e6,stroke:#cc0000,stroke-width:3px,color:#000000
+    style DB fill:#fff4e6,stroke:#ff9900,stroke-width:3px,color:#000000
 ```
 
 **Add More Workers:**
