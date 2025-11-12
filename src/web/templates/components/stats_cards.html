@@ -1,0 +1,36 @@
+<!-- Statistics Cards Component -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card error">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">ERRORS</h6>
+                <h2 class="card-title mb-0">{{ stats.ERROR or 0 }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card warn">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">WARNINGS</h6>
+                <h2 class="card-title mb-0">{{ stats.WARN or 0 }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card info">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">INFO</h6>
+                <h2 class="card-title mb-0">{{ stats.INFO or 0 }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card debug">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">DEBUG</h6>
+                <h2 class="card-title mb-0">{{ stats.DEBUG or 0 }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+

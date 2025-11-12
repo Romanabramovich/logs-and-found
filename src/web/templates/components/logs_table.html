@@ -1,0 +1,36 @@
+<!-- Logs Table Component -->
+<div class="logs-container">
+    {% if logs %}
+    <table class="table table-hover mb-0">
+        <thead class="table-light">
+            <tr>
+                <th style="width: 180px;">Timestamp</th>
+                <th style="width: 80px;">Level</th>
+                <th style="width: 150px;">Source</th>
+                <th style="width: 150px;">Application</th>
+                <th>Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr class="log-row">
+                <td class="timestamp">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td><span class="log-level log-level-{{ log.level }}">{{ log.level }}</span></td>
+                <td><code>{{ log.source }}</code></td>
+                <td><small>{{ log.application }}</small></td>
+                <td class="log-message">{{ log.message }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% include 'components/pagination.html' %}
+    
+    {% else %}
+    <div class="p-5 text-center text-muted">
+        <h4>No logs found</h4>
+        <p>Try adjusting your filters or generate some test logs.</p>
+    </div>
+    {% endif %}
+</div>
+

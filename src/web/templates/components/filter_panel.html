@@ -1,0 +1,52 @@
+<!-- Filter Panel Component -->
+<div class="filter-panel">
+    <form method="GET" action="/" class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label">Log Level</label>
+            <select name="level" class="form-select">
+                <option value="">All Levels</option>
+                <option value="ERROR" {% if filters.level == 'ERROR' %}selected{% endif %}>ERROR</option>
+                <option value="WARN" {% if filters.level == 'WARN' %}selected{% endif %}>WARN</option>
+                <option value="INFO" {% if filters.level == 'INFO' %}selected{% endif %}>INFO</option>
+                <option value="DEBUG" {% if filters.level == 'DEBUG' %}selected{% endif %}>DEBUG</option>
+            </select>
+        </div>
+        
+        <div class="col-md-3">
+            <label class="form-label">Source</label>
+            <select name="source" class="form-select">
+                <option value="">All Sources</option>
+                {% for src in sources %}
+                <option value="{{ src }}" {% if filters.source == src %}selected{% endif %}>{{ src }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="col-md-3">
+            <label class="form-label">Application</label>
+            <select name="application" class="form-select">
+                <option value="">All Applications</option>
+                {% for app in applications %}
+                <option value="{{ app }}" {% if filters.application == app %}selected{% endif %}>{{ app }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="col-md-3">
+            <label class="form-label">Search</label>
+            <input type="text" name="search" class="form-control" placeholder="Search messages..." value="{{ filters.search or '' }}">
+        </div>
+        
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+            <a href="/" class="btn btn-secondary">Clear</a>
+            <button type="button" class="btn btn-success" onclick="location.reload()">Refresh</button>
+            <button type="button" id="ws-toggle" class="btn btn-success">Start Live</button>
+            <span class="badge bg-info text-dark ms-3">
+                Showing {{ logs|length }} of {{ total }} total logs (Page {{ page }}/{{ total_pages }})
+            </span>
+            <span id="ws-status" class="badge bg-secondary ms-2">Offline</span>
+        </div>
+    </form>
+</div>
+
