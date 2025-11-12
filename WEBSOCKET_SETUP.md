@@ -103,7 +103,6 @@ python -m src.queue.worker_pool --workers 3
 ### 2. Real-Time Broadcasting
 1. FastAPI WebSocket manager subscribes to `new_logs` channel
 2. When log is published, all connected WebSocket clients receive it
-3. Browser JavaScript inserts log at top of table with animation
 
 ### 3. Web UI Features
 - ✅ **Auto-connect** - Connects to WebSocket on page load
