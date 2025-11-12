@@ -16,7 +16,7 @@ from datetime import datetime
 class LogShipper:
     """Ships log entries from a file to the API"""
     
-    def __init__(self, log_file, api_url='http://localhost:5000/logs', 
+    def __init__(self, log_file, api_url='http://127.0.0.1:5000/logs', 
                  batch_size=50, batch_timeout=5.0, position_save_interval=100):
         self.log_file = Path(log_file)
         self.api_url = api_url

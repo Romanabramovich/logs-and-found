@@ -50,7 +50,7 @@ class RedisConsumer:
         self.stream_name = stream_name
         
         # Connect to Redis
-        redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
+        redis_url = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379')
         self.redis_client = redis.from_url(redis_url, decode_responses=False)
         
         # Ensure consumer group exists

@@ -165,7 +165,7 @@ See: [src/tests/README.md](src/tests/README.md)
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `DB_URL` | ✅ Yes | - | PostgreSQL connection string |
-| `REDIS_URL` | ⚠️ Recommended | `redis://localhost:6379` | Redis connection |
+| `REDIS_URL` | ⚠️ Recommended | `redis://127.0.0.1:6379` | Redis connection |
 | `LOG_LEVEL` | No | `INFO` | Application log level |
 
 ### Configuration Files

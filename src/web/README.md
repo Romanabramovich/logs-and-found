@@ -48,7 +48,7 @@ Start the Flask server:
 python -m src.api.app
 ```
 
-Open browser to `http://localhost:5000/`
+Open browser to `http://127.0.0.1:5000/`
 
 ## Adding New Components
 

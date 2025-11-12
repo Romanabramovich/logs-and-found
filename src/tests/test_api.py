@@ -1,7 +1,7 @@
 import requests
 from datetime import datetime, timezone
 
-BASE_URL = 'http://localhost:5000'
+BASE_URL = 'http://127.0.0.1:5000'
 
 def test_successful_insert():
     """Test 1: Valid log insertion"""
@@ -88,7 +88,7 @@ def test_without_metadata():
 
 if __name__ == "__main__":
     print("Starting API Tests...")
-    print("Make sure Flask app is running on http://localhost:5000")
+    print("Make sure Flask app is running on http://127.0.0.1:5000")
     
     try:
         test_successful_insert()

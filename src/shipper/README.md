@@ -23,7 +23,7 @@ Watches a log file and ships new entries to the FastAPI `/logs` endpoint.
 ```python
 LogShipper(
     log_file='path/to/file.log',
-    api_url='http://localhost:5000/logs',
+    api_url='http://127.0.0.1:5000/logs',
     batch_size=50,              # Logs per local batch (default: 50)
     batch_timeout=5.0,          # Max seconds before sending partial batch (default: 5.0)
     position_save_interval=100  # Save position every N logs (default: 100)

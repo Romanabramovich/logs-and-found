@@ -14,8 +14,8 @@ if __name__ == "__main__":
     print("Port:    5000")
     print("Reload:  Enabled (auto-restart on code changes)")
     print("=" * 60)
-    print("\n📊 API:  http://localhost:5000")
-    print("📖 Docs: http://localhost:5000/api/docs")
+    print("\n📊 API:  http://127.0.0.1:5000")
+    print("📖 Docs: http://127.0.0.1:5000/api/docs")
     print("\nPress Ctrl+C to stop\n")
     
     # Development mode with auto-reload

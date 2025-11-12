@@ -24,7 +24,7 @@ def test_redis_queue(num_logs=1000):
     """
     Send logs to Redis queue and measure performance.
     """
-    url = 'http://localhost:5000/logs'
+    url = 'http://127.0.0.1:5000/logs'  
     
     print(f"\nSending {num_logs} logs to Redis queue...")
     print("-" * 60)
@@ -97,7 +97,7 @@ def test_redis_queue(num_logs=1000):
 def check_queue_status():
     """Check Redis queue status"""
     try:
-        response = requests.get('http://localhost:5000/queue/status')
+        response = requests.get('http://127.0.0.1:5000/queue/status')
         if response.status_code == 200:
             data = response.json()
             print("\nQueue Status:")

@@ -21,14 +21,14 @@ Enterprise-grade log aggregation platform designed for **high throughput**, **re
 
 ### 📈 Key Metrics
 
-| Metric                  | Value         | Description                          |
-| ----------------------- | ------------- | ------------------------------------ |
-| **Ingestion Rate**      | 1000+ logs/sec| Production mode with 12 workers      |
-| **API Latency**         | ~3ms          | Average response time                |
-| **Formats Supported**   | 4             | JSON, Apache, Syslog (RFC 5424/3164) |
-| **Auto-Detection**      | 100%          | Accuracy on supported formats        |
-| **Real-time Streaming** | < 100ms       | WebSocket update latency             |
-| **End-to-End Latency**  | < 3s          | Ingestion to database (batch window) |
+| Metric                  | Value          | Description                          |
+| ----------------------- | -------------- | ------------------------------------ |
+| **Ingestion Rate**      | 1000+ logs/sec | Production mode with 12 workers      |
+| **API Latency**         | ~3ms           | Average response time                |
+| **Formats Supported**   | 4              | JSON, Apache, Syslog (RFC 5424/3164) |
+| **Auto-Detection**      | 100%           | Accuracy on supported formats        |
+| **Real-time Streaming** | < 100ms        | WebSocket update latency             |
+| **End-to-End Latency**  | < 3s           | Ingestion to database (batch window) |
 
 ---
 
@@ -88,20 +88,20 @@ Create a `.env` file in the project root:
 
 ```env
 # Database Configuration
-DB_URL=postgresql://log_user:log_password@localhost:5433/log_aggregation
+DB_URL=postgresql://log_user:log_password@127.0.0.1:5433/log_aggregation
 
 # Redis Configuration (optional but recommended)
-REDIS_URL=redis://localhost:6379
+REDIS_URL=redis://127.0.0.1:6379
 ```
 
 ### 4. Setup PostgreSQL
 
 ```bash
 # Option A: Using psql directly
-psql postgresql://log_user:log_password@localhost:5433/log_aggregation -f src/data/schema.sql
+psql postgresql://log_user:log_password@127.0.0.1:5433/log_aggregation -f src/data/schema.sql
 
 # Option B: From psql prompt
-psql postgresql://log_user:log_password@localhost:5433/log_aggregation
+psql postgresql://log_user:log_password@127.0.0.1:5433/log_aggregation
 \i src/data/schema.sql
 ```
 
@@ -417,7 +417,7 @@ log-aggregation/
 | Variable    | Description                  | Default                  | Required       |
 | ----------- | ---------------------------- | ------------------------ | -------------- |
 | `DB_URL`    | PostgreSQL connection string | -                        | ✅ Yes         |
-| `REDIS_URL` | Redis connection string      | `redis://localhost:6379` | ⚠️ Recommended |
+| `REDIS_URL` | Redis connection string      | `redis://127.0.0.1:6379` | ⚠️ Recommended |
 | `LOG_LEVEL` | Application log level        | `INFO`                   | No             |
 
 ### Performance Tuning
@@ -449,12 +449,12 @@ python -m src.queue.worker_pool --workers 5 --batch-size 500
 
 ### Achieved Improvements
 
-| Optimization            | Before         | After         | Gain      |
-| ----------------------- | -------------- | ------------- | --------- |
-| Flask → FastAPI         | 0.5 logs/sec   | 24 logs/sec   | **48x**   |
-| Dev → Production mode   | 24 logs/sec    | 1000+ logs/sec| **40+x**  |
-| localhost → 127.0.0.1   | 2032ms latency | 3ms latency   | **677x**  |
-| Unified Redis Path      | Mixed paths    | Single async  | Simplified|
+| Optimization                  | Before         | After          | Gain       |
+| ----------------------------- | -------------- | -------------- | ---------- |
+| Flask → FastAPI               | 0.5 logs/sec   | 24 logs/sec    | **48x**    |
+| Dev → Production mode         | 24 logs/sec    | 1000+ logs/sec | **40+x**   |
+| Use 127.0.0.1 (not localhost) | 2032ms latency | 3ms latency    | **677x**   |
+| Unified Redis Path            | Mixed paths    | Single async   | Simplified |
 
 ### Recommendations
 
@@ -471,8 +471,8 @@ python -m src.queue.worker_pool --workers 5 --batch-size 500
 
 **Project Maintainer:** [Roman Abramovich]
 
-- GitHub: [@yourusername](https://github.com/RomanAbramovich)
-- LinkedIn: [Your Profile](www.linkedin.com/in/roman-abramovich)
+- GitHub: [@RomanAbramovich](https://github.com/RomanAbramovich)
+- LinkedIn: [Roman Abramovich](www.linkedin.com/in/roman-abramovich)
 - Email: abramovichroman19@gmail.com
 
 ---

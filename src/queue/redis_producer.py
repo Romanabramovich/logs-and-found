@@ -26,7 +26,7 @@ class RedisProducer:
             redis_url: Redis connection string (default from env)
             stream_name: Name of Redis stream
         """
-        self.redis_url = redis_url or os.getenv('REDIS_URL', 'redis://localhost:6379')
+        self.redis_url = redis_url or os.getenv('REDIS_URL', 'redis://127.0.0.1:6379')
         self.stream_name = stream_name
         
         # Connect to Redis
