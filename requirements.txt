@@ -1,0 +1,18 @@
+# Core API Framework
+fastapi
+uvicorn[standard]SGI server with performance extras
+pydantic # Data validation (pre-built wheels for Python 3.13)
+sqlalchemy
+python-dotenv
+
+# Redis for message queue and WebSocket pub/sub
+redis  # Async support built-in for WebSocket broadcasting
+
+# Template rendering (for web UI)
+jinja2
+
+# HTTP client for shipper
+requests
+
+# WebSocket support (built into FastAPI + Uvicorn)
+websockets 
