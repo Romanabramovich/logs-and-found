@@ -17,7 +17,7 @@ class LogCreate(BaseModel):
     """
     Schema for creating a new log entry.
     
-    Used by /data/ and /data/fast endpoints.
+    Used by /logs endpoint.
     """
     timestamp: str = Field(..., description="ISO format timestamp")
     level: str = Field(..., description="Log level (INFO, WARN, ERROR, DEBUG)")
@@ -54,53 +54,6 @@ class LogCreate(BaseModel):
                 "application": "api",
                 "message": "User login successful",
                 "metadata": {"user_id": 123, "ip": "192.168.1.1"}
-            }
-        }
-
-
-class LogBatchCreate(BaseModel):
-    """
-    Schema for batch log creation.
-    
-    Used by /data/batch endpoint.
-    """
-    logs: List[LogCreate] = Field(..., description="List of log entries", min_length=1, max_length=10000)
-    
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "logs": [
-                    {
-                        "timestamp": "2025-11-11T16:00:00",
-                        "level": "INFO",
-                        "source": "web-server",
-                        "application": "api",
-                        "message": "Request received"
-                    },
-                    {
-                        "timestamp": "2025-11-11T16:00:01",
-                        "level": "INFO",
-                        "source": "web-server",
-                        "application": "api",
-                        "message": "Request processed"
-                    }
-                ]
-            }
-        }
-
-
-class LogResponse(BaseModel):
-    """Standard response for successful log insertion"""
-    status: str = "success"
-    log_id: Optional[int] = None
-    message: str
-    
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "status": "success",
-                "log_id": 12345,
-                "message": "Log inserted successfully"
             }
         }
 

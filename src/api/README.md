@@ -1,19 +1,20 @@
-# src/api/ - Flask API
+# src/api/ - FastAPI Application
 
-REST API for log ingestion using Flask and SQLAlchemy.
+High-performance REST API for log ingestion using FastAPI, SQLAlchemy, and Redis.
 
 ## Files
 
-- `app.py` - Flask application and endpoints
+- `app.py` - FastAPI application and endpoints
 - `models.py` - SQLAlchemy ORM models
+- `schemas.py` - Pydantic validation schemas
 
 ## app.py
 
-Flask application with log ingestion endpoint.
+FastAPI application with async log ingestion via Redis queue.
 
-**Endpoint: `POST /data/`**
+**Main Endpoint: `POST /logs`**
 
-Accepts log entries and stores them in PostgreSQL.
+Accepts log entries and queues them in Redis for async processing.
 
 **Request:**
 ```json
@@ -27,18 +28,22 @@ Accepts log entries and stores them in PostgreSQL.
 }
 ```
 
-**Response (201):**
+**Response (202 Accepted):**
 ```json
 {
   "status": "success",
-  "log_id": 1,
-  "message": "Log inserted successfully"
+  "message_id": "1762894896750-0",
+  "message": "Log queued for processing"
 }
 ```
 
 **Run the API:**
 ```bash
-python -m src.api.app
+# Development mode
+python run_dev.py
+
+# Production mode (multi-worker)
+python run_production.py
 ```
 
 ## models.py

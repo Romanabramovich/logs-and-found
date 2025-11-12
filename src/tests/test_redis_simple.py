@@ -24,7 +24,7 @@ def test_redis_queue(num_logs=1000):
     """
     Send logs to Redis queue and measure performance.
     """
-    url = 'http://localhost:5000/data/fast'
+    url = 'http://localhost:5000/logs'
     
     print(f"\nSending {num_logs} logs to Redis queue...")
     print("-" * 60)

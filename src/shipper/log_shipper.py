@@ -16,11 +16,10 @@ from datetime import datetime
 class LogShipper:
     """Ships log entries from a file to the API"""
     
-    def __init__(self, log_file, api_url='http://localhost:5000/data/', 
+    def __init__(self, log_file, api_url='http://localhost:5000/logs', 
                  batch_size=50, batch_timeout=5.0, position_save_interval=100):
         self.log_file = Path(log_file)
         self.api_url = api_url
-        self.batch_api_url = api_url.rstrip('/') + '/batch'  # Batch endpoint
         self.position_file = Path(f"{log_file}.position")  # Track where we left off
         
         # Performance tuning parameters
@@ -131,7 +130,10 @@ class LogShipper:
     
     def flush_batch(self):
         """
-        Send current batch to API using bulk endpoint
+        Send current batch to API endpoint
+        
+        Sends individual logs to /logs endpoint (which queues them in Redis).
+        Redis workers will batch them for database insertion.
         
         Returns:
             True if successful, False otherwise
@@ -139,40 +141,41 @@ class LogShipper:
         if len(self.batch) == 0:
             return True
         
+        batch_size = len(self.batch)
+        success_count = 0
+        
         try:
-            response = self.session.post(
-                self.batch_api_url,
-                json=self.batch,
-                timeout=10  # Longer timeout for batches
-            )
+            # Send each log individually to /logs endpoint
+            # The API will queue them in Redis, and workers will batch insert
+            for log_data in self.batch:
+                try:
+                    response = self.session.post(
+                        self.api_url,
+                        json=log_data,
+                        timeout=5
+                    )
+                    
+                    if response.status_code == 202:  # Accepted (queued)
+                        success_count += 1
+                    else:
+                        print(f"API Error {response.status_code}: {response.text[:100]}")
+                        
+                except Exception as e:
+                    print(f"Request failed: {e}")
             
-            if response.status_code == 201:
-                result = response.json()
-                count = result.get('count', len(self.batch))
-                self.stats['lines_sent'] += count
-                self.stats['batches_sent'] += 1
-                print(f"✓ Sent batch: {count} logs (Total: {self.stats['lines_sent']})")
-                
-                # Clear batch and reset timer
-                self.batch = []
-                self.last_batch_time = time.time()
-                return True
-            else:
-                print(f"API Error {response.status_code}: {response.text[:100]}")
-                self.stats['lines_failed'] += len(self.batch)
-                self.batch = []  # Clear failed batch
-                return False
-                
-        except requests.exceptions.ConnectionError:
-            print(f"Cannot connect to API at {self.batch_api_url}")
-            self.stats['lines_failed'] += len(self.batch)
+            # Update stats
+            self.stats['lines_sent'] += success_count
+            self.stats['lines_failed'] += (batch_size - success_count)
+            self.stats['batches_sent'] += 1
+            
+            print(f"✓ Sent batch: {success_count}/{batch_size} logs (Total: {self.stats['lines_sent']})")
+            
+            # Clear batch and reset timer
             self.batch = []
-            return False
-        except requests.exceptions.Timeout:
-            print(f"API request timeout (batch size: {len(self.batch)})")
-            self.stats['lines_failed'] += len(self.batch)
-            self.batch = []
-            return False
+            self.last_batch_time = time.time()
+            
+            return success_count > 0
+                
         except Exception as e:
             print(f"Unexpected error: {e}")
             self.stats['lines_failed'] += len(self.batch)
@@ -216,7 +219,7 @@ class LogShipper:
         print("Log Shipper Started - High Performance Mode")
         print("=" * 60)
         print(f"Monitoring: {self.log_file}")
-        print(f"Batch API: {self.batch_api_url}")
+        print(f"API URL: {self.api_url}")
         print(f"Batch size: {self.batch_size} logs")
         print(f"Batch timeout: {self.batch_timeout}s")
         print(f"Position save interval: {self.position_save_interval} logs")

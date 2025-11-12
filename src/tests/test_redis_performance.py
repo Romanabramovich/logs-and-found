@@ -1,7 +1,7 @@
 """
-Performance Test - Redis vs Direct Database
+Performance Test - Redis Queue Ingestion
 
-Demonstrates the speed improvement of Redis queue over direct PostgreSQL writes.
+Tests the performance of the Redis-based log ingestion endpoint.
 """
 
 import requests
@@ -26,10 +26,10 @@ def create_test_log(i):
 
 def test_endpoint(endpoint, num_logs=100):
     """
-    Test an endpoint's performance.
+    Test the endpoint's performance.
     
     Args:
-        endpoint: API endpoint (/data/ or /data/fast)
+        endpoint: API endpoint (/logs)
         num_logs: Number of logs to send
         
     Returns:
@@ -116,56 +116,43 @@ def check_queue_status():
 
 
 def main():
-    """Run performance comparison"""
+    """Run performance test"""
     print("=" * 60)
-    print("Redis Performance Test")
+    print("Log Ingestion Performance Test")
     print("=" * 60)
     print("\nMake sure:")
-    print("  1. Flask API is running (python -m src.api.app)")
+    print("  1. FastAPI is running (python run_dev.py)")
     print("  2. Redis is running (docker ps | grep redis)")
     print("  3. Workers are running (python -m src.queue.worker_pool)")
     print()
     
     input("Press Enter to start test...")
     
-    num_logs = 100
+    num_logs = 500
     
-    # Test traditional endpoint
-    traditional = test_endpoint('/data/', num_logs)
-    
-    # Wait a bit
-    time.sleep(2)
-    
-    # Test Redis endpoint
-    redis_result = test_endpoint('/data/fast', num_logs)
+    # Test logs endpoint
+    result = test_endpoint('/logs', num_logs)
     
     # Check queue
     time.sleep(1)
     check_queue_status()
     
-    # Comparison
+    # Summary
     print("\n" + "=" * 60)
-    print("Performance Comparison")
+    print("Test Summary")
     print("=" * 60)
     
-    speedup = traditional['throughput'] / redis_result['throughput'] if redis_result['throughput'] > 0 else 0
-    latency_improvement = traditional['avg_latency'] / redis_result['avg_latency'] if redis_result['avg_latency'] > 0 else 0
-    
-    print(f"\nTraditional (/data/):")
-    print(f"  {traditional['throughput']:.0f} logs/sec, {traditional['avg_latency']:.1f}ms avg")
-    
-    print(f"\nRedis (/data/fast):")
-    print(f"  {redis_result['throughput']:.0f} logs/sec, {redis_result['avg_latency']:.1f}ms avg")
-    
-    print(f"\nImprovement:")
-    print(f"  {latency_improvement:.1f}x faster (latency)")
-    print(f"  Note: Redis is async - workers process in background")
+    print(f"\nEndpoint: /logs")
+    print(f"  Throughput: {result['throughput']:.0f} logs/sec")
+    print(f"  Avg Latency: {result['avg_latency']:.1f}ms")
+    print(f"  P95 Latency: {result['p95_latency']:.1f}ms")
+    print(f"  Errors: {result['errors']}")
     
     print("\n" + "=" * 60)
     
-    print("\nNote: The real benefit of Redis is handling traffic spikes.")
-    print("Traditional endpoint would slow down or crash under load.")
-    print("Redis endpoint stays fast no matter the load!")
+    print("\nNote: All logs are processed asynchronously via Redis.")
+    print("Workers batch insert logs to PostgreSQL in the background.")
+    print("The API stays fast even under heavy load!")
 
 
 if __name__ == "__main__":

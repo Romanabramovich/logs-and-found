@@ -34,14 +34,14 @@ class RedisConsumer:
     """
     
     def __init__(self, consumer_name='worker-1', group_name='log-processors', 
-                 batch_size=1000, stream_name='logs'):
+                 batch_size=500, stream_name='logs'):
         """
         Initialize consumer.
         
         Args:
             consumer_name: Unique name for this consumer
             group_name: Consumer group name (all workers share this)
-            batch_size: How many logs to process at once
+            batch_size: How many logs to process at once (default: 500)
             stream_name: Redis stream to read from
         """
         self.consumer_name = consumer_name
@@ -101,7 +101,7 @@ class RedisConsumer:
                 self.consumer_name,
                 {self.stream_name: '>'},  # '>' means new messages
                 count=self.batch_size,
-                block=1000  # Wait up to 1 second for messages
+                block=2000  # Wait up to 2 seconds for messages (batch window)
             )
             
             if not messages:
@@ -288,7 +288,7 @@ def main():
     
     consumer = RedisConsumer(
         consumer_name=consumer_name,
-        batch_size=1000
+        batch_size=500
     )
     
     consumer.run()

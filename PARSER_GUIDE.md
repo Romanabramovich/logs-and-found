@@ -259,7 +259,7 @@ curl http://127.0.0.1:5000/parse/patterns
 
 ### Option 1: Parse Then Ingest
 
-Parse a log first, then send to `/data/fast`:
+Parse a log first, then send to `/logs`:
 
 ```python
 import requests
@@ -271,12 +271,12 @@ response = requests.post('http://127.0.0.1:5000/parse/auto', json=raw_log)
 parsed = response.json()['parsed_log']
 
 # Step 2: Send to fast ingestion
-requests.post('http://127.0.0.1:5000/data/fast', json=parsed)
+requests.post('http://127.0.0.1:5000/logs', json=parsed)
 ```
 
 ### Option 2: Future Enhancement
 
-In the future, we can add a `/data/parse-and-ingest` endpoint that:
+In the future, we can add a `/parse-and-ingest` endpoint that:
 
 1. Auto-detects format
 2. Parses the log

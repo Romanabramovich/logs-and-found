@@ -50,7 +50,7 @@ def test_concurrent(num_logs=1000, max_workers=50):
         num_logs: Total logs to send
         max_workers: Number of concurrent threads
     """
-    url = 'http://127.0.0.1:5000/data/fast'  
+    url = 'http://127.0.0.1:5000/logs'  
     
     print(f"\nSending {num_logs} logs with {max_workers} concurrent threads...")
     print("-" * 60)

@@ -1,6 +1,6 @@
 # src/shipper/ - Log Shipper
 
-Monitors log files and sends entries to the Flask API.
+Monitors log files and sends entries to the FastAPI ingestion endpoint.
 
 ## Files
 
@@ -9,21 +9,22 @@ Monitors log files and sends entries to the Flask API.
 
 ## log_shipper.py
 
-Watches a log file and ships new entries to the API.
+Watches a log file and ships new entries to the FastAPI `/logs` endpoint.
 
 **Features:**
 - Tails log files for new entries
 - Parses log lines into structured format
-- POSTs to Flask API
+- POSTs to FastAPI `/logs` (queued in Redis)
 - Tracks file position (resume on restart)
-- Handles API errors with retries
+- Batches logs locally for efficiency
+- Handles API errors gracefully
 
 **Configuration:**
 ```python
 LogShipper(
     log_file='path/to/file.log',
-    api_url='http://localhost:5000/data/',
-    batch_size=50,              # Logs per batch (default: 50)
+    api_url='http://localhost:5000/logs',
+    batch_size=50,              # Logs per local batch (default: 50)
     batch_timeout=5.0,          # Max seconds before sending partial batch (default: 5.0)
     position_save_interval=100  # Save position every N logs (default: 100)
 )
@@ -45,16 +46,15 @@ python -m src.shipper.log_generator
 
 Creates `test_logs.log` with realistic log entries.
 
-## API Requirements
+## Architecture
 
-The high-performance shipper requires the `/data/batch` endpoint in the Flask API for bulk inserts:
+The shipper batches logs locally (default: 50), then sends each log individually to `/logs`. 
+The API queues all logs in Redis, and workers batch insert them to PostgreSQL (default: 500 logs or 2s timeout).
 
-```python
-@app.route('/data/batch', methods=['POST'])
-def insert_logs_batch():
-    # Accepts array of log objects
-    # Uses bulk_insert_mappings() for fast DB inserts
-```
-
-This endpoint is already implemented in `src/api/app.py`.
+**Flow:**
+1. Shipper reads log file
+2. Batches 50 logs locally
+3. Sends each to `POST /logs` (3ms response)
+4. API queues in Redis
+5. Workers batch insert to DB
 

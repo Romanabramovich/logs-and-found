@@ -14,22 +14,23 @@ This document provides a detailed explanation of the log aggregation system's ar
 
 **Key Features:**
 - **Async/await** - Non-blocking I/O for concurrent request handling
-- **Multiple endpoints** - Direct DB writes vs. Redis queue
+- **Redis-based ingestion** - All logs queued for async processing
 - **Auto-parsing** - Intelligent format detection
 - **WebSocket support** - Real-time log streaming
 
 **Endpoints:**
 ```
-POST /data/       → Direct PostgreSQL write (synchronous)
-POST /data/fast   → Redis queue (recommended, async)
+POST /logs        → Redis queue (async, high-performance)
 POST /parse/auto  → Auto-detect and parse
 WS   /ws/logs     → Real-time streaming
+GET  /queue/status → Redis queue metrics
 ```
 
 **Performance:**
-- 568 logs/sec with 12 Uvicorn workers
-- 3ms average API latency
+- 1000+ logs/sec with 12 Uvicorn workers
+- ~3ms average API latency
 - Handles traffic spikes via Redis buffering
+- Batch window: 500 logs or 2 seconds
 
 ---
 
@@ -103,12 +104,11 @@ graph TB
 # Launch with custom settings
 python -m src.queue.worker_pool \
   --workers 5 \
-  --batch-size 100 \
-  --max-retries 3
+  --batch-size 500
 ```
 
 **Performance Optimization:**
-- **Batch writes** - Inserts 100 logs per transaction
+- **Batch writes** - Inserts 500 logs per transaction (2s window)
 - **Connection pooling** - Reuses DB connections
 - **Parallel processing** - Multiple workers consume concurrently
 - **Graceful shutdown** - Completes in-flight batches
@@ -293,17 +293,17 @@ factory.add_parser(MyParser())
 
 ## Data Flow Diagrams
 
-### High-Throughput Path (Recommended)
+### Unified Async Path (Redis Queue)
 
 ```mermaid
 flowchart TD
-    Client[Client/Shipper] -->|1. HTTP POST /data/fast<br/>JSON payload| API
+    Client[Client/Shipper] -->|1. HTTP POST /logs<br/>JSON payload| API
     
-    API["FastAPI API<br/>(Uvicorn x12)<br/>⚡ 568 logs/sec"]
-    API -->|2. Push to Redis Stream<br/>non-blocking, instant return| Redis
+    API["FastAPI API<br/>(Uvicorn x12)<br/>⚡ 1000+ logs/sec"]
+    API -->|2. Push to Redis Stream<br/>non-blocking, ~3ms return| Redis
     
-    Redis["Redis Streams<br/>Queue: 'log_queue'"]
-    Redis -->|3. Workers pull batches<br/>batch_size = 100| Workers
+    Redis["Redis Streams<br/>Queue: 'logs'"]
+    Redis -->|3. Workers pull batches<br/>batch_size = 500, timeout = 2s| Workers
     
     Workers["Worker Pool<br/>(Multi-Process)<br/>3-5 processes"]
     Workers -->|4. Batch INSERT| DB
@@ -326,36 +326,16 @@ flowchart TD
 ```
 
 **Latency Breakdown:**
-- API response: 3ms (instant queue push)
-- Queue → DB: 100-500ms (batch window)
+- API response: ~3ms (instant queue push)
+- Queue → DB: < 2s (batch window)
 - DB → WebSocket: < 100ms (pub/sub)
-- **Total end-to-end: < 1 second**
+- **Total end-to-end: < 3 seconds**
 
----
-
-### Direct Write Path (Low Latency)
-
-```mermaid
-sequenceDiagram
-    participant Client
-    participant API as FastAPI
-    participant DB as PostgreSQL
-    
-    Client->>API: 1. HTTP POST /data/
-    activate API
-    API->>DB: 2. Direct INSERT (synchronous)
-    activate DB
-    DB-->>API: Confirm & return log ID
-    deactivate DB
-    API-->>Client: 3. Response with log ID
-    deactivate API
-    
-    Note over Client,DB: Slower (25x) but guarantees persistence
-```
-
-**Use Case:** When immediate confirmation is critical
-
-**Trade-off:** Slower (25x) but guarantees persistence before response
+**Benefits:**
+- **High throughput**: 1000+ logs/sec
+- **Low API latency**: ~3ms response time
+- **Traffic spike handling**: Redis buffers bursts
+- **Horizontal scalability**: Add more workers independently
 
 ---
 

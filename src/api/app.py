@@ -19,8 +19,7 @@ from typing import List
 from ..database import get_database_engine  
 from .models import Log
 from .schemas import (
-    LogCreate, LogBatchCreate, LogResponse, 
-    LogFastResponse, QueueStatusResponse, ErrorResponse
+    LogCreate, LogFastResponse, QueueStatusResponse, ErrorResponse
 )
 
 # Initialize FastAPI app
@@ -215,11 +214,11 @@ async def index(
 
 
 @app.post(
-    "/data/fast", 
+    "/logs", 
     response_model=LogFastResponse,
     status_code=202,
     tags=["Log Ingestion"],
-    summary="Fast log ingestion via Redis queue",
+    summary="Log ingestion via Redis queue",
     responses={
         202: {"description": "Log queued for processing"},
         400: {"model": ErrorResponse, "description": "Invalid request"},
@@ -227,12 +226,12 @@ async def index(
         503: {"model": ErrorResponse, "description": "Redis unavailable"}
     }
 )
-async def insert_log_fast(log: LogCreate):
+async def insert_log(log: LogCreate):
     """
     **High-performance log ingestion using Redis queue.**
     
-    Returns in <10ms by writing to Redis instead of PostgreSQL.
-    Workers process logs asynchronously in batches.
+    All logs are processed asynchronously via Redis Stream.
+    Workers batch insert logs to PostgreSQL for optimal throughput.
     """
     if not REDIS_ENABLED:
         raise HTTPException(status_code=503, detail="Redis not available")
@@ -282,124 +281,6 @@ async def queue_status():
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.post(
-    "/data/", 
-    response_model=LogResponse,
-    status_code=201,
-    tags=["Log Ingestion"],
-    summary="Direct database log insertion",
-    responses={
-        201: {"description": "Log inserted successfully"},
-        400: {"model": ErrorResponse, "description": "Invalid request"},
-        500: {"model": ErrorResponse, "description": "Database error"}
-    }
-)
-async def insert_log_direct(log: LogCreate):
-    """
-    **Direct database log insertion (slower but synchronous).**
-    
-    - Writes directly to PostgreSQL
-    - Returns after database commit
-    - Use for low-volume or critical logs
-    
-    **Performance:** ~10-50 logs/sec
-    
-    **Tip:** Use `/data/fast` for better performance!
-    """
-    session = Session()
-    
-    try:
-        # Create the Log object
-        log_entry = Log(
-            timestamp=datetime.fromisoformat(log.timestamp),
-            level=log.level.upper(),
-            source=log.source,
-            application=log.application,
-            message=log.message,
-            log_metadata=log.metadata
-        )
-        
-        # Add to session and commit
-        session.add(log_entry)
-        session.commit()
-        
-        # Return success with log ID
-        return LogResponse(
-            status="success",
-            log_id=log_entry.id,
-            message="Log inserted successfully"
-        )
-    
-    except ValueError as e:
-        session.rollback()
-        raise HTTPException(status_code=400, detail=f"Invalid data format: {str(e)}")
-    
-    except Exception as e:
-        session.rollback()
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-    
-    finally:
-        session.close()
-
-
-@app.post(
-    "/data/batch", 
-    status_code=201,
-    tags=["Log Ingestion"],
-    summary="Batch log insertion",
-    responses={
-        201: {"description": "Logs inserted successfully"},
-        400: {"model": ErrorResponse, "description": "Invalid request"},
-        500: {"model": ErrorResponse, "description": "Database error"}
-    }
-)
-async def insert_logs_batch(batch: LogBatchCreate):
-    """
-    **Bulk insert endpoint for high-performance log shipping.**
-    
-    - Accepts up to 10,000 logs per request
-    - Uses bulk insert for better performance
-    - Validates all logs before inserting
-    
-    **Performance:** ~100-500 logs/sec per request
-    """
-    session = Session()
-    
-    try:
-        # Prepare bulk insert data
-        log_mappings = []
-        for log_data in batch.logs:
-            log_mappings.append({
-                'timestamp': datetime.fromisoformat(log_data.timestamp),
-                'level': log_data.level.upper(),
-                'source': log_data.source,
-                'application': log_data.application,
-                'message': log_data.message,
-                'log_metadata': log_data.metadata
-            })
-        
-        # Bulk insert - much faster than individual inserts
-        session.bulk_insert_mappings(Log, log_mappings)
-        session.commit()
-        
-        return {
-            "status": "success",
-            "count": len(batch.logs),
-            "message": f"Successfully inserted {len(batch.logs)} logs"
-        }
-    
-    except ValueError as e:
-        session.rollback()
-        raise HTTPException(status_code=400, detail=f"Invalid data format: {str(e)}")
-    
-    except Exception as e:
-        session.rollback()
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-    
-    finally:
-        session.close()
 
 
 @app.get("/health", tags=["System"])

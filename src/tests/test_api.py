@@ -19,11 +19,11 @@ def test_successful_insert():
         }
     }
     
-    response = requests.post(f'{BASE_URL}/data/', json=log_data)
+    response = requests.post(f'{BASE_URL}/logs', json=log_data)
     print(f"Status: {response.status_code}")
     print(f"Response: {response.json()}")
-    assert response.status_code == 201, "Should return 201 Created"
-    assert "log_id" in response.json(), "Should return log_id"
+    assert response.status_code == 202, "Should return 202 Accepted"
+    assert "message_id" in response.json(), "Should return message_id"
     print("PASSED")
 
 
@@ -39,10 +39,10 @@ def test_missing_required_field():
         "message": "Some error"
     }
     
-    response = requests.post(f'{BASE_URL}/data/', json=log_data)
+    response = requests.post(f'{BASE_URL}/logs', json=log_data)
     print(f"Status: {response.status_code}")
     print(f"Response: {response.json()}")
-    assert response.status_code == 400, "Should return 400 Bad Request"
+    assert response.status_code == 422, "Should return 422 Unprocessable Entity"
     print("PASSED")
 
 
@@ -59,10 +59,10 @@ def test_invalid_metadata_type():
         "metadata": "this should be a dict, not a string!"
     }
     
-    response = requests.post(f'{BASE_URL}/data/', json=log_data)
+    response = requests.post(f'{BASE_URL}/logs', json=log_data)
     print(f"Status: {response.status_code}")
     print(f"Response: {response.json()}")
-    assert response.status_code == 400, "Should return 400 Bad Request"
+    assert response.status_code == 422, "Should return 422 Unprocessable Entity"
     print("PASSED")
 
 
@@ -79,10 +79,10 @@ def test_without_metadata():
         # No metadata field - should be fine!
     }
     
-    response = requests.post(f'{BASE_URL}/data/', json=log_data)
+    response = requests.post(f'{BASE_URL}/logs', json=log_data)
     print(f"Status: {response.status_code}")
     print(f"Response: {response.json()}")
-    assert response.status_code == 201, "Should return 201 Created"
+    assert response.status_code == 202, "Should return 202 Accepted"
     print("PASSED")
 
 

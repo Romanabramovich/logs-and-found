@@ -51,13 +51,13 @@ class WorkerPool:
     No duplicates - Redis consumer groups handle distribution.
     """
     
-    def __init__(self, num_workers=3, batch_size=1000):
+    def __init__(self, num_workers=3, batch_size=500):
         """
         Initialize worker pool.
         
         Args:
             num_workers: Number of parallel workers
-            batch_size: Batch size for each worker
+            batch_size: Batch size for each worker (default: 500)
         """
         self.num_workers = num_workers
         self.batch_size = batch_size
@@ -169,8 +169,8 @@ def main():
     parser = argparse.ArgumentParser(description='Log Processing Worker Pool')
     parser.add_argument('--workers', type=int, default=3,
                         help='Number of worker processes (default: 3)')
-    parser.add_argument('--batch-size', type=int, default=1000,
-                        help='Batch size for each worker (default: 1000)')
+    parser.add_argument('--batch-size', type=int, default=500,
+                        help='Batch size for each worker (default: 500)')
     
     args = parser.parse_args()
     

@@ -10,9 +10,9 @@ We've added **real-time WebSocket streaming** to the log aggregation system! Log
 
 ```mermaid
 flowchart TD
-    Client["📱 HTTP Client"] -->|POST /data/fast<br/>Log Data| API
+    Client["📱 HTTP Client"] -->|POST /logs<br/>Log Data| API
     
-    API["🚀 FastAPI App<br/>/data/fast endpoint<br/>• Receives logs via HTTP POST<br/>• Enqueues to Redis Stream"]
+    API["🚀 FastAPI App<br/>/logs endpoint<br/>• Receives logs via HTTP POST<br/>• Enqueues to Redis Stream"]
     
     API -->|Enqueue| Stream
     
@@ -94,10 +94,10 @@ python -m src.queue.worker_pool --workers 3
 ## How It Works
 
 ### 1. Log Ingestion Flow
-1. Client sends log via POST `/data/fast`
+1. Client sends log via POST `/logs`
 2. FastAPI enqueues to Redis Stream
-3. Worker pool consumes from stream
-4. Worker inserts to PostgreSQL
+3. Worker pool consumes from stream (batch: 500 logs or 2s)
+4. Worker batch inserts to PostgreSQL
 5. **Worker publishes to Redis pub/sub channel `new_logs`**
 
 ### 2. Real-Time Broadcasting
@@ -130,7 +130,7 @@ python -m src.queue.worker_pool --workers 3
 
 4. **Send a test log** (in new terminal):
    ```bash
-   curl -X POST http://127.0.0.1:5000/data/fast \
+   curl -X POST http://127.0.0.1:5000/logs \
      -H "Content-Type: application/json" \
      -d '{"timestamp":"2025-11-11T16:00:00","level":"INFO","source":"test","application":"websocket-test","message":"Hello WebSocket!"}'
    ```
@@ -143,7 +143,7 @@ Send 100 logs and watch them stream in real-time:
 
 ```bash
 cd src/tests
-python -c "import requests; import time; [requests.post('http://127.0.0.1:5000/data/fast', json={'timestamp':time.strftime('%Y-%m-%dT%H:%M:%S'), 'level':'INFO', 'source':'load-test', 'application':'test', 'message':f'Test log {i}'}) for i in range(100)]; print('Sent 100 logs!')"
+python -c "import requests; import time; [requests.post('http://127.0.0.1:5000/logs', json={'timestamp':time.strftime('%Y-%m-%dT%H:%M:%S'), 'level':'INFO', 'source':'load-test', 'application':'test', 'message':f'Test log {i}'}) for i in range(100)]; print('Sent 100 logs!')"
 ```
 
 You should see logs streaming into the web UI in real-time!

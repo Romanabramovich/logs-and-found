@@ -61,8 +61,6 @@ Start here if you're new to the project:
 
 ### Integration Guides
 
-- **[docs/GRAFANA_SETUP.md](docs/GRAFANA_SETUP.md)**
-  - Grafana installation
   - Data source configuration
   - Dashboard import
   - Custom panel creation
@@ -105,9 +103,7 @@ Each major directory contains its own README:
 
 **Ingestion:**
 ```
-POST /data/          - Direct PostgreSQL write
-POST /data/fast      - High-speed Redis queue
-POST /data/batch     - Batch ingestion
+POST /logs           - High-performance Redis queue (all logs)
 ```
 
 **Parsing:**
@@ -182,10 +178,6 @@ See: [src/tests/README.md](src/tests/README.md)
 
 ## 📦 Additional Resources
 
-### Grafana Dashboards
-
-- **[docs/grafana/overview-dashboard.json](docs/grafana/overview-dashboard.json)**
-  - Pre-built Grafana dashboard
   - Import-ready JSON
   - Includes: log volume, error rates, sources
 

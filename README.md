@@ -21,14 +21,14 @@ Enterprise-grade log aggregation platform designed for **high throughput**, **re
 
 ### 📈 Key Metrics
 
-| Metric                  | Value        | Description                          |
-| ----------------------- | ------------ | ------------------------------------ |
-| **Ingestion Rate**      | 568 logs/sec | Production mode with 12 workers      |
-| **API Latency**         | 3ms          | Average response time                |
-| **Formats Supported**   | 4            | JSON, Apache, Syslog (RFC 5424/3164) |
-| **Auto-Detection**      | 100%         | Accuracy on supported formats        |
-| **Real-time Streaming** | < 100ms      | WebSocket update latency             |
-| **Performance Gain**    | 23.6x        | vs. Flask development server         |
+| Metric                  | Value         | Description                          |
+| ----------------------- | ------------- | ------------------------------------ |
+| **Ingestion Rate**      | 1000+ logs/sec| Production mode with 12 workers      |
+| **API Latency**         | ~3ms          | Average response time                |
+| **Formats Supported**   | 4             | JSON, Apache, Syslog (RFC 5424/3164) |
+| **Auto-Detection**      | 100%          | Accuracy on supported formats        |
+| **Real-time Streaming** | < 100ms       | WebSocket update latency             |
+| **End-to-End Latency**  | < 3s          | Ingestion to database (batch window) |
 
 ---
 
@@ -46,10 +46,10 @@ Enterprise-grade log aggregation platform designed for **high throughput**, **re
 
 ### Observability
 
-- 📊 **Grafana Integration** - Pre-built dashboards for metrics
-- 🎨 **Modern Web UI** - Bootstrap-powered log viewer with filters
+- 🎨 **Modern Web UI** - Bootstrap-powered log viewer with filters and real-time updates
 - 📖 **Interactive API Docs** - Auto-generated Swagger/OpenAPI documentation
 - 🔍 **Advanced Filtering** - Search by level, source, application, timerange
+- 📊 **Live Statistics** - Real-time metrics cards showing log counts and error rates
 
 ### Developer Experience
 
@@ -154,17 +154,16 @@ graph TB
     Sources -->|HTTP POST<br/>JSON/Text| API
 
     subgraph FastAPI["FASTAPI INGESTION API"]
-        Endpoints["POST /data/fast - Redis queue<br/>POST /data/ - Direct DB<br/>POST /parse/auto - Auto-detect<br/>WS /ws/logs - Real-time"]
+        Endpoints["POST /logs - Redis queue<br/>POST /parse/auto - Auto-detect<br/>WS /ws/logs - Real-time"]
     end
 
     API[FastAPI] --> Endpoints
 
-    API -->|Fast Path| Redis
-    API -->|Direct Path| PostgresDB
+    API -->|All logs → Redis| Redis
 
     Redis["REDIS<br/>• Streams (Queue)<br/>• Pub/Sub"]
 
-    Redis -->|Async Processing| Workers
+    Redis -->|Async Processing<br/>Batch: 500 logs / 2s| Workers
 
     subgraph WorkerPool["WORKER POOL"]
         W1[Worker 1]
@@ -180,18 +179,13 @@ graph TB
     W2 -->|Batch Insert| DB
     W3 -->|Batch Insert| DB
 
-    PostgresDB[Direct Write] --> DB
-
     DB[("POSTGRESQL<br/>• logs table<br/>• JSONB metadata<br/>• Indexed queries")]
 
     DB --> Dashboard
-    DB --> Grafana
 
     Redis -.->|Pub/Sub| Dashboard
 
-    Dashboard["WEB DASHBOARD<br/>• Live updates<br/>• Filtering<br/>• Search<br/>• WebSocket"]
-
-    Grafana["GRAFANA<br/>• Time-series<br/>• Alerts<br/>• Analytics<br/>• Custom panels"]
+    Dashboard["WEB DASHBOARD<br/>• Live updates (WebSocket)<br/>• Advanced filtering<br/>• Full-text search<br/>• Statistics cards<br/>• Pagination"]
 
     style Sources fill:#e6f3ff,stroke:#0066cc,stroke-width:2px,color:#000000
     style API fill:#e6ffe6,stroke:#00cc00,stroke-width:3px,color:#000000
@@ -199,18 +193,18 @@ graph TB
     style Redis fill:#ffe6e6,stroke:#cc0000,stroke-width:3px,color:#000000
     style WorkerPool fill:#fff4e6,stroke:#ff9900,stroke-width:2px,color:#000000
     style DB fill:#e6ffe6,stroke:#00cc00,stroke-width:3px,color:#000000
-    style Dashboard fill:#f0e6ff,stroke:#9900cc,stroke-width:2px,color:#000000
-    style Grafana fill:#f0e6ff,stroke:#9900cc,stroke-width:2px,color:#000000
+    style Dashboard fill:#f0e6ff,stroke:#9900cc,stroke-width:3px,color:#000000
 ```
 
 ### Data Flow
 
-1. **Ingestion** - FastAPI receives logs via HTTP POST (568 logs/sec)
-2. **Queuing** - Redis Streams buffer logs for async processing
+1. **Ingestion** - FastAPI receives logs via HTTP POST (1000+ logs/sec)
+2. **Queuing** - All logs pushed to Redis Streams for async processing
 3. **Parsing** - Auto-detect format (JSON/Apache/Syslog) and normalize
-4. **Storage** - Worker pool batch-writes to PostgreSQL
-5. **Broadcasting** - Redis Pub/Sub notifies WebSocket clients
-6. **Visualization** - Real-time dashboard updates + Grafana metrics
+4. **Batching** - Workers accumulate 500 logs or wait 2s before flushing
+5. **Storage** - Worker pool batch-writes to PostgreSQL
+6. **Broadcasting** - Redis Pub/Sub notifies WebSocket clients in real-time
+7. **Visualization** - Web dashboard displays logs with live updates and statistics
 
 ---
 
@@ -220,7 +214,7 @@ graph TB
 
 ```bash
 # Using curl
-curl -X POST http://127.0.0.1:5000/data/fast \
+curl -X POST http://127.0.0.1:5000/logs \
   -H "Content-Type: application/json" \
   -d '{
     "timestamp": "2025-11-11T16:00:00",
@@ -235,20 +229,22 @@ curl -X POST http://127.0.0.1:5000/data/fast \
 ```python
 # Using Python requests
 import requests
+from datetime import datetime
 
 log_entry = {
-    "timestamp": "2025-11-11T16:00:00",
+    "timestamp": datetime.now().isoformat(),
     "level": "INFO",
     "source": "app-server",
     "application": "auth",
-    "message": "User logged in successfully"
+    "message": "User logged in successfully",
+    "metadata": {"user_id": 789}
 }
 
 response = requests.post(
-    "http://127.0.0.1:5000/data/fast",
+    "http://127.0.0.1:5000/logs",
     json=log_entry
 )
-print(response.json())
+print(response.json())  # Returns: {"status": "success", "message_id": "...", ...}
 ```
 
 ### Auto-Parse Different Log Formats
@@ -316,12 +312,10 @@ python src/tests/test_redis_concurrent.py
 
 ## 📖 Documentation
 
+- **[Architecture](ARCHITECTURE.md)** - Detailed system design and data flow
 - **[Parser Guide](PARSER_GUIDE.md)** - Multi-format parsing system
 - **[WebSocket Setup](WEBSOCKET_SETUP.md)** - Real-time streaming configuration
-- **[Performance Results](PERFORMANCE_RESULTS.md)** - Benchmark analysis
-- **[FastAPI Migration](FASTAPI_MIGRATION.md)** - Flask → FastAPI upgrade notes
-- **[Grafana Setup](docs/GRAFANA_SETUP.md)** - Dashboard configuration
-- **[Redis Quick Start](docs/REDIS_QUICK_START.md)** - Message queue setup
+- **[Documentation Index](DOCUMENTATION.md)** - Complete documentation reference
 
 ---
 
@@ -344,11 +338,7 @@ python src/tests/test_redis_concurrent.py
 - **Jinja2** - Server-side templating
 - **Bootstrap 5** - Responsive UI framework
 - **WebSocket API** - Real-time log streaming
-
-### Monitoring
-
-- **Grafana** - Time-series visualization and alerting
-- **Custom Metrics** - Log volume, error rates, latency
+- **Custom Dashboard** - Built-in web UI with statistics and filtering
 
 ---
 
@@ -380,9 +370,7 @@ log-aggregation/
 │   ├── tests/            # Test suites
 │   ├── data/             # Database schemas
 │   └── database.py       # DB connection utilities
-├── docs/                 # Documentation
-│   ├── grafana/          # Grafana dashboards
-│   └── *.md              # Guides and specs
+├── docs/                 # Documentation and guides
 ├── run_dev.py            # Development server
 ├── run_production.py     # Production server
 ├── requirements.txt      # Python dependencies
@@ -391,24 +379,11 @@ log-aggregation/
 
 ---
 
-## 🎨 Web Dashboard Features
-
-- **Real-Time Updates** - Live log streaming with WebSocket
-- **Advanced Filtering** - By level (INFO/WARN/ERROR), source, application
-- **Search** - Full-text search across log messages
-- **Pagination** - Efficient browsing of large datasets
-- **Statistics Cards** - Total logs, error rate, recent activity
-- **Responsive Design** - Works on desktop, tablet, mobile
-
----
-
 ## 📊 API Endpoints
 
 ### Log Ingestion
 
-- `POST /data/` - Direct PostgreSQL write
-- `POST /data/fast` - High-speed Redis queue (recommended)
-- `POST /data/batch` - Batch ingestion (multiple logs)
+- `POST /logs` - High-performance Redis queue ingestion (all logs)
 
 ### Log Parsing
 
@@ -418,8 +393,7 @@ log-aggregation/
 
 ### Log Retrieval
 
-- `GET /logs/` - Paginated log list with filters
-- `GET /logs/{id}` - Get specific log entry
+- `GET /` - Web dashboard with paginated log list and filters
 
 ### Real-Time
 
@@ -431,6 +405,8 @@ log-aggregation/
 - `GET /queue/status` - Redis queue statistics
 
 **Interactive API Documentation:** http://127.0.0.1:5000/api/docs
+
+**Note:** All logs are processed asynchronously via Redis for optimal performance. Workers batch insert logs to PostgreSQL with a configurable batch size (default: 500 logs or 2 second timeout).
 
 ---
 
@@ -463,8 +439,8 @@ python run_production.py
 **Worker Pool:**
 
 ```bash
-# Adjust worker count based on load
-python -m src.queue.worker_pool --workers 5 --batch-size 100
+# Adjust worker count and batch size based on load
+python -m src.queue.worker_pool --workers 5 --batch-size 500
 ```
 
 ---
@@ -473,20 +449,21 @@ python -m src.queue.worker_pool --workers 5 --batch-size 100
 
 ### Achieved Improvements
 
-| Optimization            | Before         | After        | Gain      |
-| ----------------------- | -------------- | ------------ | --------- |
-| Flask → FastAPI         | 0.5 logs/sec   | 24 logs/sec  | **48x**   |
-| Dev → Production mode   | 24 logs/sec    | 568 logs/sec | **23.6x** |
-| localhost → 127.0.0.1   | 2032ms latency | 3ms latency  | **677x**  |
-| Direct DB → Redis Queue | Blocking       | Non-blocking | ∞         |
+| Optimization            | Before         | After         | Gain      |
+| ----------------------- | -------------- | ------------- | --------- |
+| Flask → FastAPI         | 0.5 logs/sec   | 24 logs/sec   | **48x**   |
+| Dev → Production mode   | 24 logs/sec    | 1000+ logs/sec| **40+x**  |
+| localhost → 127.0.0.1   | 2032ms latency | 3ms latency   | **677x**  |
+| Unified Redis Path      | Mixed paths    | Single async  | Simplified|
 
 ### Recommendations
 
-1. **Use Redis Queue** - Enables async processing and traffic buffering
-2. **Production Mode** - Leverage all CPU cores with multi-worker setup
-3. **Batch Inserts** - Worker pool uses batch writes for efficiency
+1. **Production Mode** - Leverage all CPU cores with multi-worker setup
+2. **Tune Batch Size** - Default 500 logs per batch, adjust based on traffic patterns
+3. **Scale Workers** - Add more worker processes to handle higher throughput
 4. **Use 127.0.0.1** - Avoid Windows DNS resolution delays
 5. **Connection Pooling** - SQLAlchemy pools DB connections automatically
+6. **Redis Persistence** - Enable AOF/RDB for queue durability
 
 ---
 
