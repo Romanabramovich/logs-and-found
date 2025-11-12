@@ -149,11 +149,11 @@ python -m src.queue.worker_pool --workers 3
 
 ```mermaid
 graph TB
-    Sources["📱 LOG SOURCES<br/>Applications, Services, Servers, Containers"]
+    Sources["LOG SOURCES<br/>Applications, Services, Servers, Containers"]
 
     Sources -->|HTTP POST<br/>JSON/Text| API
 
-    subgraph FastAPI["🚀 FASTAPI INGESTION API"]
+    subgraph FastAPI["FASTAPI INGESTION API"]
         Endpoints["POST /data/fast - Redis queue<br/>POST /data/ - Direct DB<br/>POST /parse/auto - Auto-detect<br/>WS /ws/logs - Real-time"]
     end
 
@@ -162,11 +162,11 @@ graph TB
     API -->|Fast Path| Redis
     API -->|Direct Path| PostgresDB
 
-    Redis["🔴 REDIS<br/>• Streams (Queue)<br/>• Pub/Sub"]
+    Redis["REDIS<br/>• Streams (Queue)<br/>• Pub/Sub"]
 
     Redis -->|Async Processing| Workers
 
-    subgraph WorkerPool["⚙️ WORKER POOL"]
+    subgraph WorkerPool["WORKER POOL"]
         W1[Worker 1]
         W2[Worker 2]
         W3[Worker N]
@@ -182,25 +182,25 @@ graph TB
 
     PostgresDB[Direct Write] --> DB
 
-    DB[("🗄️ POSTGRESQL<br/>• logs table<br/>• JSONB metadata<br/>• Indexed queries")]
+    DB[("POSTGRESQL<br/>• logs table<br/>• JSONB metadata<br/>• Indexed queries")]
 
     DB --> Dashboard
     DB --> Grafana
 
     Redis -.->|Pub/Sub| Dashboard
 
-    Dashboard["📊 WEB DASHBOARD<br/>• Live updates<br/>• Filtering<br/>• Search<br/>• WebSocket"]
+    Dashboard["WEB DASHBOARD<br/>• Live updates<br/>• Filtering<br/>• Search<br/>• WebSocket"]
 
-    Grafana["📈 GRAFANA<br/>• Time-series<br/>• Alerts<br/>• Analytics<br/>• Custom panels"]
+    Grafana["GRAFANA<br/>• Time-series<br/>• Alerts<br/>• Analytics<br/>• Custom panels"]
 
-    style Sources fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
-    style API fill:#e6ffe6,stroke:#00cc00,stroke-width:3px
-    style FastAPI fill:#f0ffe6,stroke:#66cc00,stroke-width:2px
-    style Redis fill:#ffe6e6,stroke:#cc0000,stroke-width:3px
-    style WorkerPool fill:#fff4e6,stroke:#ff9900,stroke-width:2px
-    style DB fill:#e6ffe6,stroke:#00cc00,stroke-width:3px
-    style Dashboard fill:#f0e6ff,stroke:#9900cc,stroke-width:2px
-    style Grafana fill:#ffe6f0,stroke:#cc0099,stroke-width:2px
+    style Sources fill:#e6f3ff,stroke:#000000,stroke-width:2px
+    style API fill:#e6ffe6,stroke:#000000,stroke-width:3px
+    style FastAPI fill:#f0ffe6,stroke:#000000,stroke-width:2px
+    style Redis fill:#ffe6e6,stroke:#000000,stroke-width:3px
+    style WorkerPool fill:#fff4e6,stroke:#000000,stroke-width:2px
+    style DB fill:#e6ffe6,stroke:#000000,stroke-width:3px
+    style Dashboard fill:#f0e6ff,stroke:#000000,stroke-width:2px
+    style Grafana fill:#ffe6f0,stroke:#000000,stroke-width:2px
 ```
 
 ### Data Flow
