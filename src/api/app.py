@@ -5,6 +5,7 @@ Log Aggregation API
 from fastapi import FastAPI, HTTPException, Query, Request, WebSocket, WebSocketDisconnect, Body
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import func
 from datetime import datetime
@@ -46,6 +47,10 @@ except Exception as e:
 # Setup Jinja2 templates for web UI
 template_dir = Path(__file__).parent.parent / 'web' / 'templates'
 templates = Jinja2Templates(directory=str(template_dir))
+
+# Mount static files (images, css, js)
+static_dir = template_dir / 'images'
+app.mount("/static/images", StaticFiles(directory=str(static_dir)), name="static_images")
 
 # Database setup
 engine = get_database_engine()

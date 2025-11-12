@@ -1,92 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Log Aggregation System{% endblock %}</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Logs & Found{% endblock %}</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/static/images/favicon.png" />
+
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
     <!-- Custom CSS -->
     <style>
-        :root {
-            --error-color: #dc3545;
-            --warn-color: #ffc107;
-            --info-color: #0dcaf0;
-            --debug-color: #6c757d;
-        }
+      :root {
+        --error-color: #dc3545;
+        --warn-color: #ffc107;
+        --info-color: #02a942;
+        --debug-color: #007fed;
+      }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #f8f9fa;
-        }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background-color: #f8f9fa;
+      }
 
-        .navbar {
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+      .navbar {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        font-weight: bold;
+      }
 
-        .log-level {
-            font-weight: bold;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.85em;
-        }
+      .log-level {
+        font-weight: bold;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.85em;
+      }
 
-        .log-level-ERROR { background-color: var(--error-color); color: white; }
-        .log-level-WARN { background-color: var(--warn-color); color: #000; }
-        .log-level-INFO { background-color: var(--info-color); color: #000; }
-        .log-level-DEBUG { background-color: var(--debug-color); color: white; }
+      .log-level-ERROR {
+        background-color: var(--error-color);
+        color: white;
+      }
+      .log-level-WARN {
+        background-color: var(--warn-color);
+        color: #000;
+      }
+      .log-level-INFO {
+        background-color: var(--info-color);
+        color: #000;
+      }
+      .log-level-DEBUG {
+        background-color: var(--debug-color);
+        color: white;
+      }
 
-        .log-row:hover { background-color: #f0f0f0; }
+      .log-row:hover {
+        background-color: #f0f0f0;
+      }
 
-        .timestamp {
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            color: #6c757d;
-        }
+      .timestamp {
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+        color: #6c757d;
+      }
 
-        .log-message {
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-        }
+      .log-message {
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+      }
 
-        .stats-card { border-left: 4px solid; }
-        .stats-card.error { border-left-color: var(--error-color); }
-        .stats-card.warn { border-left-color: var(--warn-color); }
-        .stats-card.info { border-left-color: var(--info-color); }
-        .stats-card.debug { border-left-color: var(--debug-color); }
+      .stats-card {
+        border-left: 4px solid;
+      }
+      .stats-card.error {
+        border-left-color: var(--error-color);
+      }
+      .stats-card.warn {
+        border-left-color: var(--warn-color);
+      }
+      .stats-card.info {
+        border-left-color: var(--info-color);
+      }
+      .stats-card.debug {
+        border-left-color: var(--debug-color);
+      }
 
-        .filter-panel {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
+      .filter-panel {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
 
-        .logs-container {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
+      .logs-container {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
     </style>
-    
+
     {% block extra_css %}{% endblock %}
-</head>
-<body>
+  </head>
+  <body>
     <!-- Navigation -->
     {% include 'components/navbar.html' %}
-    
+
     <!-- Main Content -->
-    <div class="container-fluid">
-        {% block content %}{% endblock %}
-    </div>
-    
+    <div class="container-fluid">{% block content %}{% endblock %}</div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     {% block extra_js %}{% endblock %}
-</body>
+  </body>
 </html>
