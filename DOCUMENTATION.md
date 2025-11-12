@@ -41,52 +41,22 @@ Start here if you're new to the project:
   - Connection management
   - Testing WebSocket functionality
 
-- **[PERFORMANCE_RESULTS.md](PERFORMANCE_RESULTS.md)**
-  - Benchmark results
-  - Performance optimizations
-  - Before/after comparisons
-  - Tuning recommendations
-
----
-
-## 🛠️ Technical Guides
-
-### Migration & Upgrades
-
-- **[FASTAPI_MIGRATION.md](FASTAPI_MIGRATION.md)**
-  - Flask → FastAPI migration notes
-  - Breaking changes
-  - Performance improvements
-  - API endpoint changes
-
-### Integration Guides
-
-  - Data source configuration
-  - Dashboard import
-  - Custom panel creation
-
-- **[docs/REDIS_QUICK_START.md](docs/REDIS_QUICK_START.md)**
-  - Redis installation
-  - Message queue setup
-  - Worker configuration
-  - Troubleshooting
-
 ---
 
 ## 📁 Directory-Specific Documentation
 
 Each major directory contains its own README:
 
-| Directory | README | Purpose |
-|-----------|--------|---------|
-| `src/` | [src/README.md](src/README.md) | Source code overview |
-| `src/api/` | [src/api/README.md](src/api/README.md) | API layer documentation |
-| `src/queue/` | [src/queue/README.md](src/queue/README.md) | Redis queue system |
-| `src/shipper/` | [src/shipper/README.md](src/shipper/README.md) | Log collection agents |
-| `src/web/` | [src/web/README.md](src/web/README.md) | Web UI templates |
-| `src/tests/` | [src/tests/README.md](src/tests/README.md) | Test suites |
-| `src/data/` | [src/data/README.md](src/data/README.md) | Database schemas |
-| `docs/` | [docs/README.md](docs/README.md) | Additional documentation |
+| Directory      | README                                           | Purpose                  |
+| -------------- | ------------------------------------------------ | ------------------------ |
+| `src/`         | [src/README.md](src/README.md)                   | Source code overview     |
+| `src/api/`     | [src/api/README.md](src/api/README.md)           | API layer documentation  |
+| `src/queue/`   | [src/queue/README.md](src/queue/README.md)       | Redis queue system       |
+| `src/shipper/` | [src/shipper/README.md](src/shipper/README.md)   | Log collection agents    |
+| `src/web/`     | [src/web/README.md](src/web/README.md)           | Web UI templates         |
+| `src/tests/`   | [src/tests/README.md](src/tests/README.md)       | Test suites              |
+| `src/data/`    | [src/data/README.md](src/data/README.md)         | Database schemas         |
+| `demo/`        | [demo/README.md](demo/README.md)                 | Interactive demo page    |
 
 
 ---
@@ -136,12 +106,13 @@ GET  /queue/status   - Redis queue stats
 
 ### Test Suites
 
-| Test File | Purpose | Runtime |
-|-----------|---------|---------|
-| `test_api.py` | API endpoint tests | < 1s |
-| `test_parsers.py` | Parser functionality | < 1s |
-| `test_redis_performance.py` | Redis integration | 2-5s |
-| `test_redis_concurrent.py` | Performance benchmark | 2-5s |
+| Test File                   | Purpose              | Runtime |
+| --------------------------- | -------------------- | ------- |
+| `test_api.py`               | API endpoint tests   | < 1s    |
+| `test_parsers.py`           | Parser functionality | < 1s    |
+| `test_redis_simple.py`      | Basic Redis tests    | < 1s    |
+| `test_redis_performance.py` | Redis integration    | 2-5s    |
+| `test_redis_concurrent.py`  | Performance benchmark| 2-5s    |
 
 ### Running Tests
 
@@ -162,11 +133,13 @@ See: [src/tests/README.md](src/tests/README.md)
 
 ### Environment Variables
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `DB_URL` | ✅ Yes | - | PostgreSQL connection string |
-| `REDIS_URL` | ⚠️ Recommended | `redis://127.0.0.1:6379` | Redis connection |
-| `LOG_LEVEL` | No | `INFO` | Application log level |
+| Variable     | Required       | Default                     | Description                  |
+| ------------ | -------------- | --------------------------- | ---------------------------- |
+| `DB_URL`     | ✅ Yes         | -                           | PostgreSQL connection string |
+| `REDIS_URL`  | ⚠️ Recommended | `redis://127.0.0.1:6379`    | Redis connection             |
+| `LOG_LEVEL`  | No             | `INFO`                      | Application log level        |
+
+**Note:** Always use `127.0.0.1` instead of `localhost` in connection strings to avoid DNS resolution delays on Windows
 
 ### Configuration Files
 
@@ -176,15 +149,25 @@ See: [src/tests/README.md](src/tests/README.md)
 
 ---
 
-## 📦 Additional Resources
-
-  - Import-ready JSON
-  - Includes: log volume, error rates, sources
-
 ### Example Code
 
 - **[src/shipper/log_generator.py](src/shipper/log_generator.py)** - Generate test logs
 - **[src/shipper/log_shipper.py](src/shipper/log_shipper.py)** - Ship logs from files
-- **[src/tests/](src/tests/)** - Test examples
+- **[src/tests/](src/tests/)** - Comprehensive test examples
+
+### Quick Start Scripts
+
+- **[run_dev.py](run_dev.py)** - Development server with auto-reload
+- **[run_production.py](run_production.py)** - Production server with multi-workers
+
+---
+
+## 📞 Contact & Support
+
+**Project Maintainer:** Roman Abramovich
+
+- GitHub: [@RomanAbramovich](https://github.com/RomanAbramovich)
+- LinkedIn: [Roman Abramovich](www.linkedin.com/in/roman-abramovich)
+- Email: abramovichroman19@gmail.com
 
 ---
