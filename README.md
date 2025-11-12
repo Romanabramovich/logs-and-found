@@ -1,4 +1,4 @@
-# 📊 Distributed Log Aggregation Platform
+# 📊Logs & Found - Disributed Logging Aggregation
 
 <div align="center">
 
